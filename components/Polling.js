@@ -65,7 +65,7 @@ export default function Polling() {
   const [formInput, updateFormInput] = useState({
     option1: "",
     option2: "",
-    time_to_lock: "3600",
+    time_to_lock: "1",
   });
 
   const milestoneAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
@@ -195,7 +195,7 @@ export default function Polling() {
     if (status === "connected") {
       updatePollings();
     }
-  }, [status, account]);
+  }, [status, account, num]);
 
   async function createPollings() {
     const { option1, option2 } = formInput;
@@ -215,11 +215,25 @@ export default function Polling() {
         calldata: [
           parseInt(toFelt("0x" + ConvertStringToHex(formInput.option1))),
           parseInt(toFelt("0x" + ConvertStringToHex(formInput.option2))),
-          parseInt(formInput.time_to_lock),
+          parseInt(formInput.time_to_lock) * 3600,
         ],
       },
     ],
   });
+
+  useEffect(() => {
+    console.log("masuk sini polling 1");
+    if (status == "connected") {
+      if (receipt && receipt.status == "ACCEPTED_ON_L2") {
+        console.log("masuk sini polling");
+        setIsMinting(false);
+        refreshNum();
+        setHash(undefined);
+      }
+    } else {
+      // setCreator(false);
+    }
+  }, [receipt]);
 
   async function createProposal() {
     // create the items and list them on the marketplace
@@ -231,7 +245,7 @@ export default function Polling() {
       // transaction = await contract.makeMarketItem(nftaddress, tokenId, price, {value: listingPrice})
       // await transaction.wait()
 
-      await crtProposal();
+      await crtProposal().then((tx) => setHash(tx.transaction_hash));
 
       // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
     } catch {
@@ -394,6 +408,21 @@ export default function Polling() {
               }}
             />
             <br />
+            <p className="mt-2">Polling time Duration (in Hour)</p>
+            <input
+              //   disabled={!onSale}
+              placeholder="Time in Hour"
+              className="mt-2 border rounded p-4 w-100"
+              type="text"
+              name="time"
+              value={formInput.time_to_lock}
+              onChange={(e) => {
+                if (isNaN(e.target.value)) {
+                  return;
+                }
+                updateFormInput({ ...formInput, time_to_lock: e.target.value });
+              }}
+            />
           </div>
         </Modal.Body>
         <Modal.Footer>

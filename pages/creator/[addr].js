@@ -4,10 +4,25 @@ import CreatorView from "../../components/CreatorView";
 import Head from "next/head";
 import { useChain } from "react-moralis";
 
+import { toHex, toHexString, toFelt } from "starknet/utils/number";
+import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
+import {
+  useAccount,
+  useConnectors,
+  useContract,
+  useNetwork,
+  useStarknetCall,
+  useStarknet,
+  useStarknetExecute,
+  useTransactionReceipt,
+} from "@starknet-react/core";
+import { Contract, Provider } from "starknet";
+
 export default function Creator() {
+  const { account, address, status } = useAccount();
   const router = useRouter();
   const { addr } = router.query;
-  const { switchNetwork, chainId } = useChain();
+  // const { switchNetwork, chainId } = useChain();
 
   useEffect(() => {
     if (addr) {
@@ -24,13 +39,11 @@ export default function Creator() {
         <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       </Head>
       <div>
-        {chainId == "0x3e9" ? (
-          <CreatorView address={addr} />
+        {status == "connected" ? (
+          <CreatorView addrs={addr} />
         ) : (
           <span className=" navbar-text justify-content-center">
-            <button onClick={() => switchNetwork("0x3e9")}>
-              Change to Klaytn Baobab{" "}
-            </button>
+            Oopss..something is wrong
           </span>
         )}
       </div>

@@ -22,16 +22,32 @@ import Loader from "./Loader";
 import { useRouter } from "next/router";
 import CollectibleView from "./CollectibleView";
 import PollingView from "./PollingView";
-let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
+import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_token_Abi from "../constants/abis/Ciri_ERC20.json";
+// let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
 
-export default function CreatorView({ address }) {
+import { toHex, toHexString, toFelt } from "starknet/utils/number";
+import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
+import {
+  useAccount,
+  useConnectors,
+  useContract,
+  useNetwork,
+  useStarknetCall,
+  useStarknet,
+  useStarknetExecute,
+  useTransactionReceipt,
+} from "@starknet-react/core";
+import { Contract, Provider } from "starknet";
+
+export default function CreatorView({ addrs }) {
   const router = useRouter();
   const { addr } = router.query;
 
   let valueToSend = "0";
 
-  const { chainId, account, isWeb3Enabled } = useMoralis();
-  const { runContractFunction } = useWeb3Contract();
+  const { account, address, status } = useAccount();
+  // const { runContractFunction } = useWeb3Contract();
   const [showModal, setShowModal] = useState(false);
   const [isDonating, setIsDonating] = useState(false);
   const handleCloseModal = () => setShowModal(false);
@@ -42,6 +58,8 @@ export default function CreatorView({ address }) {
   const [isFetching, setIsFetching] = useState(false);
   const [creator, setCreator] = useState([]);
   const [isMinting, setIsMinting] = useState(false);
+  const [hash, setHash] = useState(undefined);
+  const [profiles, setProfiles] = useState(null);
 
   const [formInput, updateFormInput] = useState({
     price: "0",
@@ -52,153 +70,160 @@ export default function CreatorView({ address }) {
     // ]
   });
 
-  const milestoneAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-  const { runContractFunction: getFunds } = useWeb3Contract({
-    abi: milestoneAbi,
-    contractAddress: milestoneAddress,
-    functionName: "getFunds",
-    params: {
-      creator: addr,
+  const ciriAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+  const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_ADDRESS;
+
+  const { contract } = useContract({
+    address: ciriAddress,
+    abi: ciri_profile_Abi,
+  });
+
+  const { contract: contract_token } = useContract({
+    address: tokenAddress,
+    abi: ciri_token_Abi,
+  });
+
+  const {
+    data: receipt,
+    loading: loadingReceipt,
+    error: errorReceipt,
+  } = useTransactionReceipt({ hash, watch: true });
+
+  const {
+    data: profiles_data,
+    loading: loadingProfile,
+    error: errorProfile,
+    refresh: refreshBalance,
+  } = useStarknetCall({
+    contract,
+    method: "get_profile_by_id",
+    args: [[toFelt(addr), 0]],
+    options: {
+      watch: true,
     },
   });
 
-  const { runContractFunction: getCreator } = useWeb3Contract({
-    abi: milestoneAbi,
-    contractAddress: milestoneAddress,
-    functionName: "getCreator",
-    params: {
-      creator: addr,
+  const {
+    data: donators_count,
+    loading: loadingCount,
+    error: errorCount,
+    refresh: refreshCount,
+  } = useStarknetCall({
+    contract,
+    method: "get_donators_count_by_id",
+    args: [[toFelt(addr), 0]],
+    options: {
+      watch: true,
     },
   });
 
-  const { runContractFunction: getDonatorsCount } = useWeb3Contract({
-    abi: milestoneAbi,
-    contractAddress: milestoneAddress,
-    functionName: "getDonatorsCount",
-    params: {
-      creator: addr,
+  const {
+    data: milestone,
+    loading: loadingMilestone,
+    error: errorMilestone,
+    refresh: refreshMilestone,
+  } = useStarknetCall({
+    contract,
+    method: "get_profile_milestone",
+    args: [[toFelt(addr), 0]],
+    options: {
+      watch: true,
     },
   });
 
-  const { runContractFunction: getMilestones } = useWeb3Contract({
-    abi: milestoneAbi,
-    contractAddress: milestoneAddress,
-    functionName: "getMilestones",
-    params: {
-      creator: addr,
-    },
+  const { execute: donate_fund } = useStarknetExecute({
+    calls: [
+      {
+        contractAddress:
+          "0x62230ea046a9a5fbc261ac77d03c8d41e5d442db2284587570ab46455fd2488",
+        entrypoint: "increaseAllowance",
+        calldata: [
+          toFelt(ciriAddress),
+          (parseFloat(formInput.price) * 10 ** 18).toString(),
+          0,
+        ],
+      },
+      {
+        contractAddress: ciriAddress,
+        entrypoint: "donate",
+        calldata: [
+          toFelt(addr),
+          0,
+          (parseFloat(formInput.price) * 10 ** 18).toString(),
+          0,
+        ],
+      },
+    ],
   });
 
-  // const { runContractFunction: donateFund } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "donate",
-  //   msgValue: TEST,
-  //   params: {
-  //     creator: addr,
-  //   },
-  // });
+  /**
+   * Converts an array of utf-8 numerical short strings into a readable string
+   * @param {bigint[]} felts - The array of encoded short strings
+   * @returns {string} - The readable string
+   */
+  function feltArrToStr(felts) {
+    return felts.reduce(
+      (memo, felt) => memo + Buffer.from(felt.toString(16), "hex").toString(),
+      ""
+    );
+  }
+
+  const ciri_profile_contract = new Contract(
+    ciri_profile_Abi,
+    ciriAddress,
+    new Provider({
+      sequencer: {
+        baseUrl: "http://localhost:5050",
+        // network: "goerli-alpha",
+      },
+      // sequencer:
+      //   "http://localhost:5050/feeder_gateway/call_contract?blockNumber=pending",
+    })
+  );
 
   async function updateAllData() {
     setIsFetching(true);
-    await updateFunds();
-    await updateDonatorsCount();
-    await updateMilestones();
-    await updateCreator();
+    let dataAfter = [];
+    if (profiles_data) {
+      const owner = await ciri_profile_contract.ownerOf([toFelt(addr), 0]);
+      let isOwner = toFelt(address) == owner.owner;
+      console.log("masuk sini profiles_data");
+      const pic = await ciri_profile_contract.get_profile_img_id([
+        profiles_data.creator_id.low.toString(),
+        profiles_data.creator_id.high.toString(),
+      ]);
+      console.log("PIC");
+      console.log(pic);
+      const img_url = feltArrToStr(pic.uri_img);
+
+      dataAfter.push({ ...profiles_data, pic: img_url, isOwner });
+    }
+    console.log(dataAfter);
+    setProfiles(dataAfter);
+
+    // await updateFunds();
+    // await updateDonatorsCount();
+    // await updateMilestones();
+    // await updateCreator();
     setIsFetching(false);
   }
 
-  async function updateFunds() {
-    let fundsData = await getFunds();
-
-    fundsData = utils.formatUnits(fundsData, "ether");
-
-    setFunds(fundsData);
-  }
-
-  async function updateCreator() {
-    let creatorData = await getCreator();
-
-    setCreator(creatorData);
-  }
-
-  async function updateDonatorsCount() {
-    let donatorsData = await getDonatorsCount();
-    donatorsData = donatorsData.toString();
-    setdonatorsCount(donatorsData);
-  }
-
-  async function updateMilestones() {
-    let milestonesData = await getMilestones();
-
-    let dataAfter = [];
-
-    await Promise.all(
-      milestonesData.map(async (data, index) => {
-        let tokenURIResponse = await (await fetch(data)).json();
-
-        // tokenURIResponse.push({ tokenId: index });
-
-        let isEligible = await runContractFunction({
-          params: {
-            abi: milestoneAbi,
-            contractAddress: milestoneAddress,
-            functionName: "isEligibleToMint",
-            params: {
-              creatorAddress: addr,
-              donator: account,
-              milestoneId: index,
-            },
-          },
-          onError: (error) => {},
-          onSuccess: async (success) => {},
-        });
-
-        let tokenId = await runContractFunction({
-          params: {
-            abi: milestoneAbi,
-            contractAddress: milestoneAddress,
-            functionName: "getTokenId",
-            params: {
-              creator: addr,
-              milestoneId: index,
-            },
-          },
-          onError: (error) => {},
-          onSuccess: async (success) => {},
-        });
-
-        let balanceOf = await runContractFunction({
-          params: {
-            abi: milestoneAbi,
-            contractAddress: milestoneAddress,
-            functionName: "balanceOf",
-            params: {
-              account: account,
-              id: tokenId,
-            },
-          },
-          onError: (error) => {},
-          onSuccess: async (success) => {},
-        });
-
-        dataAfter.push({
-          ...tokenURIResponse,
-          milestoneId: index,
-          isCanMint: isEligible,
-          balanceOf: balanceOf.toString(),
-        });
-      })
-    );
-
-    setMilestones(dataAfter);
-  }
+  useEffect(() => {
+    if (status == "connected" && router.isReady) {
+      refreshBalance();
+      refreshCount();
+      console.log("profiles nih");
+      console.log(profiles);
+    }
+  }, [status, account, router.isReady]);
 
   useEffect(() => {
-    if (isWeb3Enabled && router.isReady) {
+    if (status == "connected" && router.isReady) {
       updateAllData();
+      console.log("profiles nih");
+      console.log(profiles);
     }
-  }, [isWeb3Enabled, account, router.isReady]);
+  }, [router.isReady, profiles_data, donators_count]);
 
   function text_truncate(str, length, ending) {
     if (length == null) {
@@ -225,35 +250,49 @@ export default function CreatorView({ address }) {
     // setDonateFund(utils.parseEther(price).toString());
     valueToSend = utils.parseEther(price).toString();
 
-    await runContractFunction({
-      params: {
-        abi: milestoneAbi,
-        contractAddress: milestoneAddress,
-        functionName: "donate",
-        msgValue: valueToSend,
-        params: {
-          creator: addr,
-        },
-      },
-      onError: (error) => {},
-      onSuccess: async (success) => {
-        await success.wait(1);
-        sendSocket(`${account} donate : ${price} KLAY. Message : ${message}`);
-        updateMilestones();
-      },
-      onComplete: (success) => {},
-    });
+    await donate_fund().then((tx) => setHash(tx.transaction_hash));
 
-    setIsDonating(false);
+    // await runContractFunction({
+    //   params: {
+    //     abi: milestoneAbi,
+    //     contractAddress: milestoneAddress,
+    //     functionName: "donate",
+    //     msgValue: valueToSend,
+    //     params: {
+    //       creator: addr,
+    //     },
+    //   },
+    //   onError: (error) => {},
+    //   onSuccess: async (success) => {
+    //     await success.wait(1);
+    //     sendSocket(`${account} donate : ${price} KLAY. Message : ${message}`);
+    //     updateMilestones();
+    //   },
+    //   onComplete: (success) => {},
+    // });
   }
 
-  function sendSocket(message) {
-    socket.emit("sending-donate", `${addr}`, message);
-  }
+  useEffect(() => {
+    if (status == "connected") {
+      if (receipt && receipt.status == "ACCEPTED_ON_L2") {
+        // refreshCollectibles();
+        refreshBalance();
+        refreshCount();
+        setIsDonating(false);
+        setHash(undefined);
+      }
+    } else {
+      // setCreator(false);
+    }
+  }, [receipt]);
 
-  function sendSocketNFT(message) {
-    socket.emit("sending-nft", `${addr}`, message);
-  }
+  // function sendSocket(message) {
+  //   socket.emit("sending-donate", `${addr}`, message);
+  // }
+
+  // function sendSocketNFT(message) {
+  //   socket.emit("sending-nft", `${addr}`, message);
+  // }
 
   async function mintMilestone(mlsId) {
     // create the items and list them on the marketplace
@@ -264,26 +303,24 @@ export default function CreatorView({ address }) {
     try {
       // transaction = await contract.makeMarketItem(nftaddress, tokenId, price, {value: listingPrice})
       // await transaction.wait()
-
-      runContractFunction({
-        params: {
-          abi: milestoneAbi,
-          contractAddress: milestoneAddress,
-          functionName: "mintDonatorNFT",
-          params: { creator: addr, milestoneId: mlsId },
-        },
-        onError: (error) => {},
-        onSuccess: async (success) => {
-          await success.wait(1);
-          setIsMinting(false);
-          sendSocketNFT(
-            `Congrats !. ${account} Mint Milestone NFT: ${mlsId + 1}`
-          );
-          updateMilestones();
-          //   updateUI();
-        },
-      });
-
+      // runContractFunction({
+      //   params: {
+      //     abi: milestoneAbi,
+      //     contractAddress: milestoneAddress,
+      //     functionName: "mintDonatorNFT",
+      //     params: { creator: addr, milestoneId: mlsId },
+      //   },
+      //   onError: (error) => {},
+      //   onSuccess: async (success) => {
+      //     await success.wait(1);
+      //     setIsMinting(false);
+      //     sendSocketNFT(
+      //       `Congrats !. ${account} Mint Milestone NFT: ${mlsId + 1}`
+      //     );
+      //     updateMilestones();
+      //     //   updateUI();
+      //   },
+      // });
       // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
     } catch {
       console.error("Too long waited to mint, go to main page");
@@ -302,8 +339,10 @@ export default function CreatorView({ address }) {
             <Loader />
           </div>
         ) : (
-          isWeb3Enabled &&
-          addr != null && (
+          status == "connected" &&
+          addr != null &&
+          profiles != null &&
+          profiles.length > 0 && (
             <>
               <Row className="text-center">
                 <Col
@@ -314,9 +353,10 @@ export default function CreatorView({ address }) {
                   className="border border-white p-3 m-3 shadow-lg"
                 >
                   <h4 className="pb-2">Creator</h4>
-                  <h5 className="pb-2">{creator.name}</h5>
+                  <h5 className="pb-2">{feltArrToStr([profiles[0].name])}</h5>
                   <img
-                    src={creator.pic}
+                    src={profiles[0].pic}
+                    className="pb-2"
                     style={{
                       objectFit: "cover",
                       height: "300px",
@@ -326,10 +366,7 @@ export default function CreatorView({ address }) {
                   ></img>
                   <span className="navbar-text justify-content-center">
                     <button
-                      disabled={
-                        isDonating ||
-                        account.toUpperCase() == addr.toUpperCase()
-                      }
+                      disabled={isDonating || profiles[0].isOwner}
                       onClick={() => {
                         handleShowModal();
                       }}
@@ -360,7 +397,7 @@ export default function CreatorView({ address }) {
                       height: "170px",
                     }}
                   >
-                    {donatorsCount} <br></br>
+                    {donators_count && donators_count.toString()} <br></br>
                   </h2>
 
                   <h3>Supportes</h3>
@@ -380,74 +417,14 @@ export default function CreatorView({ address }) {
                       <div className="justify-content-center">
                         <Loader />
                       </div>
-                    ) : milestones.length > 0 ? (
-                      milestones.map((tokenURIResponse, i) => {
-                        return (
-                          <Card
-                            key={i}
-                            className="m-3 justify-content-center shadow-lg"
-                            style={{ width: "18rem" }}
-                          >
-                            <div className="pt-4 justify-content-center">
-                              <Card.Img
-                                style={{
-                                  objectFit: "cover",
-                                  height: "300px",
-                                  width: "15rem",
-                                }}
-                                src={tokenURIResponse.image}
-                              />
-                            </div>
-
-                            <Card.Body>
-                              <Card.Title>{tokenURIResponse.name}</Card.Title>
-                              <Card.Text
-                                style={{
-                                  height: "75px",
-                                }}
-                              >
-                                {text_truncate(
-                                  tokenURIResponse.description,
-                                  65
-                                )}{" "}
-                                <br></br> ({tokenURIResponse.price} Klay).
-                              </Card.Text>
-                              <div>
-                                <Button
-                                  disabled={
-                                    (!tokenURIResponse.isCanMint &&
-                                      tokenURIResponse.balanceOf == "0") ||
-                                    isMinting
-                                  }
-                                  onClick={async () => {
-                                    // PUT MINTING CODE HERE
-                                    if (tokenURIResponse.balanceOf == "0") {
-                                      await mintMilestone(
-                                        tokenURIResponse.milestoneId
-                                      );
-                                    } else {
-                                      // OPENSEA
-                                      window.open(
-                                        `https://testnets.opensea.io/collection/ciriverse-jfodnapiqk`,
-                                        "_blank"
-                                      );
-                                    }
-                                  }}
-                                  variant="primary"
-                                >
-                                  {isMinting
-                                    ? "Minting.."
-                                    : tokenURIResponse.isCanMint
-                                    ? "Mint"
-                                    : tokenURIResponse.balanceOf == "0"
-                                    ? "Not Eligible"
-                                    : "Open Sea"}
-                                </Button>
-                              </div>
-                            </Card.Body>
-                          </Card>
-                        );
-                      })
+                    ) : milestone ? (
+                      <h2 className="text-white">
+                        {parseFloat(
+                          uint256ToBN(milestone.milestone).toString()
+                        ) /
+                          10 ** 18 +
+                          " ETH"}
+                      </h2>
                     ) : (
                       <div className="text-white">
                         <img
@@ -479,9 +456,9 @@ export default function CreatorView({ address }) {
         </Modal.Header>
         <Modal.Body className="justify-content-center">
           <div className="justify-content-center text-black">
-            <p>Donate in Klay</p>
+            <p>Donate in Eth</p>
             <input
-              placeholder="Donate in Klay"
+              placeholder="Donate in Eth"
               className="mt-2 border rounded p-4 w-100"
               type="text"
               name="price"

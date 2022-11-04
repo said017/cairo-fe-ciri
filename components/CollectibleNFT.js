@@ -120,19 +120,19 @@ export default function CollectibleNFT() {
     error: errorReceipt,
   } = useTransactionReceipt({ hash, watch: true });
 
-  const {
-    data: collectible_data,
-    loading: loadingCollectibles,
-    error: errorCollectibles,
-    refresh: refreshCollectibles,
-  } = useStarknetCall({
-    contract,
-    method: "get_collectibles",
-    args: [toFelt(address)],
-    options: {
-      watch: false,
-    },
-  });
+  // const {
+  //   data: collectible_data,
+  //   loading: loadingCollectibles,
+  //   error: errorCollectibles,
+  //   refresh: refreshCollectibles,
+  // } = useStarknetCall({
+  //   contract,
+  //   method: "get_collectibles",
+  //   args: [toFelt(address)],
+  //   options: {
+  //     watch: false,
+  //   },
+  // });
 
   const {
     data: tokenId,
@@ -192,37 +192,48 @@ export default function CollectibleNFT() {
     // );
     // setCollectibles(dataAfter);
     // setIsFetching(false);
-    if (collectible_data) {
-      console.log(collectible_data);
-      if (collectible_data.collectible.length > 0) {
+    if (tokenId) {
+      console.log("TokenID");
+      console.log(tokenId);
+      const col_counts = await ciri_profile_contract.get_collectibles_count([
+        tokenId.tokenId.low.toString(),
+        tokenId.tokenId.high.toString(),
+      ]);
+      if (col_counts > 0) {
         console.log("masuk sini uri col");
-        // const uri = await ciri_profile_contract.get_collectible_img_id(
-        //   [
-        //     collectible_data.collectible[0].profile_id.low.toString(),
-        //     collectible_data.collectible[0].profile_id.high.toString(),
-        //   ],
-        //   // collectible_data.collectible[0].profile_id,
-        //   0
-        // );
-        // console.log("uri nya");
-        // console.log(uri);
-        await Promise.all(
-          collectible_data.collectible.map(async (data, i) => {
-            console.log("masuk sini ga ayah");
-            const uri = await ciri_profile_contract.get_collectible_img_id(
-              [data.profile_id.low.toString(), data.profile_id.high.toString()],
-              // collectible_data.collectible[0].profile_id,
-              i
-            );
-            console.log(uri);
+        console.log(col_counts);
+        for (let i = 0; i < parseInt(col_counts.count.toString()); i++) {
+          console.log("masuk sini ga ayah");
+          const uri = await ciri_profile_contract.get_collectible_img_id(
+            [tokenId.tokenId.low.toString(), tokenId.tokenId.high.toString()],
+            // collectible_data.collectible[0].profile_id,
+            i + 1
+          );
+          console.log(uri);
 
-            const tokenURIResponse = await (
-              await fetch(feltArrToStr(uri.uri_img))
-            ).json();
-            dataAfter.push(tokenURIResponse);
-            console.log(tokenURIResponse);
-          })
-        );
+          const tokenURIResponse = await (
+            await fetch(feltArrToStr(uri.uri_img))
+          ).json();
+          dataAfter.push(tokenURIResponse);
+          console.log(tokenURIResponse);
+        }
+        // await Promise.all(
+        //   col_counts.collectible.map(async (data, i) => {
+        //     console.log("masuk sini ga ayah");
+        //     const uri = await ciri_profile_contract.get_collectible_img_id(
+        //       [tokenId.low.toString(), tokenId.high.toString()],
+        //       // collectible_data.collectible[0].profile_id,
+        //       i + 1
+        //     );
+        //     console.log(uri);
+
+        //     const tokenURIResponse = await (
+        //       await fetch(feltArrToStr(uri.uri_img))
+        //     ).json();
+        //     dataAfter.push(tokenURIResponse);
+        //     console.log(tokenURIResponse);
+        //   })
+        // );
         setCollectibles(dataAfter);
         setIsFetching(false);
       }
@@ -240,15 +251,17 @@ export default function CollectibleNFT() {
 
   useEffect(() => {
     if (status === "connected") {
+      // refreshCollectibles();
       updateCollectibles();
     }
-  }, [status, account, collectible_data, tokenId]);
+  }, [status, account, tokenId]);
 
   useEffect(() => {
     if (status == "connected") {
       if (receipt && receipt.status == "ACCEPTED_ON_L2") {
         setFileUrlFelt([]);
-        refreshCollectibles();
+        // refreshCollectibles();
+        updateCollectibles();
         setIsMinting(false);
         setHash(undefined);
       }

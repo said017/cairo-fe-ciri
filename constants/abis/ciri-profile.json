@@ -326,6 +326,17 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "withdraw",
+        "outputs": [
+            {
+                "name": "amount",
+                "type": "Uint256"
+            }
+        ],
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "name": "profile_id",
@@ -805,19 +816,15 @@
     {
         "inputs": [
             {
-                "name": "owner",
-                "type": "felt"
+                "name": "profile_id",
+                "type": "Uint256"
             }
         ],
-        "name": "get_collectibles",
+        "name": "get_collectibles_count",
         "outputs": [
             {
-                "name": "collectible_len",
+                "name": "count",
                 "type": "felt"
-            },
-            {
-                "name": "collectible",
-                "type": "Collectible*"
             }
         ],
         "stateMutability": "view",
@@ -932,6 +939,23 @@
             }
         ],
         "name": "get_donators_count",
+        "outputs": [
+            {
+                "name": "donators",
+                "type": "felt"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "name": "tokenId",
+                "type": "Uint256"
+            }
+        ],
+        "name": "get_donators_count_by_id",
         "outputs": [
             {
                 "name": "donators",

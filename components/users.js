@@ -10,68 +10,176 @@ import { useEffect, useState } from "react";
 import { utils } from "ethers";
 import Loader from "./Loader";
 import { useRouter } from "next/router";
+import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import { toHex, toHexString, toFelt } from "starknet/utils/number";
+import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
+import {
+  useAccount,
+  useConnectors,
+  useContract,
+  useNetwork,
+  useStarknetCall,
+  useStarknet,
+  useStarknetExecute,
+  useTransactionReceipt,
+} from "@starknet-react/core";
+import { Contract, Provider } from "starknet";
 
 export default function Users() {
-  const { chainId, account, isWeb3Enabled } = useMoralis();
-  const [funds, setFunds] = useState("0");
-  const [donatorsCount, setdonatorsCount] = useState("0");
-  const [milestones, setMilestones] = useState([]);
+  const { account, address, status } = useAccount();
+  // const [funds, setFunds] = useState("0");
+  // const [donatorsCount, setdonatorsCount] = useState("0");
+  const [profiles, setProfiles] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const router = useRouter();
 
-  const milestoneAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-  const { runContractFunction: getFunds } = useWeb3Contract({
-    abi: milestoneAbi,
-    contractAddress: milestoneAddress,
-    functionName: "getFunds",
-    params: {
-      creator: account,
+  const ciriAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+  // const { runContractFunction: getFunds } = useWeb3Contract({
+  //   abi: milestoneAbi,
+  //   contractAddress: milestoneAddress,
+  //   functionName: "getFunds",
+  //   params: {
+  //     creator: account,
+  //   },
+  // });
+
+  // const { runContractFunction: getDonatorsCount } = useWeb3Contract({
+  //   abi: milestoneAbi,
+  //   contractAddress: milestoneAddress,
+  //   functionName: "getDonatorsCount",
+  //   params: {
+  //     creator: account,
+  //   },
+  // });
+
+  // const { runContractFunction: getCreators } = useWeb3Contract({
+  //   abi: milestoneAbi,
+  //   contractAddress: ciriAddress,
+  //   functionName: "getCreators",
+  // });
+
+  // async function updateFunds() {
+  //   let fundsData = await getFunds();
+  //   fundsData = utils.formatUnits(fundsData, "ether");
+
+  //   setFunds(fundsData);
+  // }
+
+  // async function updateDonatorsCount() {
+  //   let donatorsData = await getDonatorsCount();
+  //   donatorsData = utils.formatEther(donatorsData);
+  //   setdonatorsCount(donatorsData);
+  // }
+  const ciri_profile_contract = new Contract(
+    ciri_profile_Abi,
+    ciriAddress,
+    new Provider({
+      sequencer: {
+        baseUrl: "http://localhost:5050",
+        // network: "goerli-alpha",
+      },
+      // sequencer:
+      //   "http://localhost:5050/feeder_gateway/call_contract?blockNumber=pending",
+    })
+  );
+
+  /**
+   * Converts an array of utf-8 numerical short strings into a readable string
+   * @param {bigint[]} felts - The array of encoded short strings
+   * @returns {string} - The readable string
+   */
+  function feltArrToStr(felts) {
+    return felts.reduce(
+      (memo, felt) => memo + Buffer.from(felt.toString(16), "hex").toString(),
+      ""
+    );
+  }
+
+  const { contract } = useContract({
+    address: ciriAddress,
+    abi: ciri_profile_Abi,
+  });
+
+  const {
+    data: num,
+    loading: loadingNum,
+    error: errorNum,
+    refresh: refreshNum,
+  } = useStarknetCall({
+    contract,
+    method: "get_profile_counter",
+    args: [],
+    options: {
+      watch: true,
     },
   });
 
-  const { runContractFunction: getDonatorsCount } = useWeb3Contract({
-    abi: milestoneAbi,
-    contractAddress: milestoneAddress,
-    functionName: "getDonatorsCount",
-    params: {
-      creator: account,
-    },
-  });
+  async function updateCreators() {
+    // setIsFetching(true);
+    // let creatorsData = await getCreators();
+    console.log("masuk sini ga ya");
 
-  const { runContractFunction: getCreators } = useWeb3Contract({
-    abi: milestoneAbi,
-    contractAddress: milestoneAddress,
-    functionName: "getCreators",
-  });
-
-  async function updateFunds() {
-    let fundsData = await getFunds();
-    fundsData = utils.formatUnits(fundsData, "ether");
-
-    setFunds(fundsData);
-  }
-
-  async function updateDonatorsCount() {
-    let donatorsData = await getDonatorsCount();
-    donatorsData = utils.formatEther(donatorsData);
-    setdonatorsCount(donatorsData);
-  }
-
-  async function updateMilestones() {
+    // setMilestones(creatorsData);
+    // setIsFetching(false);
     setIsFetching(true);
-    let creatorsData = await getCreators();
+    // let num = await getNumProposals();
 
-    setMilestones(creatorsData);
+    let dataAfter = [];
+
+    if (num) {
+      console.log(num.number);
+      console.log(uint256ToBN(num.number).toString());
+      for (let i = 0; i < parseInt(uint256ToBN(num.number).toString()); i++) {
+        // let data = await runContractFunction({
+        //   params: {
+        //     abi: daoAbi,
+        //     contractAddress: daoAddress,
+        //     functionName: "s_proposals",
+        //     params: {
+        //       creator: account,
+        //       index: i,
+        //     },
+        //   },
+        //   onError: (error) => {},
+        //   onSuccess: async (success) => {},
+        // });
+        const data = await ciri_profile_contract.get_profile_by_id(
+          bnToUint256(i + 1)
+        );
+        const pic = await ciri_profile_contract.get_profile_img_id(
+          bnToUint256(i + 1)
+        );
+        const img_url = feltArrToStr(pic.uri_img);
+        console.log("data nya");
+        console.log(data);
+        console.log("PIC");
+        console.log(pic);
+        dataAfter.push({ ...data, pic: img_url });
+      }
+      console.log(dataAfter);
+      setProfiles(dataAfter);
+    }
+
     setIsFetching(false);
   }
 
   useEffect(() => {
-    if (isWeb3Enabled) {
-      updateFunds();
-      updateDonatorsCount();
-      updateMilestones();
+    if (status == "connected") {
+      // updateFunds();
+      // updateDonatorsCount();
+      refreshNum();
+      updateCreators();
     }
-  }, [isWeb3Enabled, account]);
+  }, [status, account]);
+
+  useEffect(() => {
+    if (status == "connected") {
+      // updateFunds();
+      // updateDonatorsCount();
+      // refreshNum();
+      updateCreators();
+    }
+  }, [num]);
 
   function text_truncate(str, length, ending) {
     if (length == null) {
@@ -104,13 +212,17 @@ export default function Users() {
                 <div className="justify-content-center">
                   <Loader />
                 </div>
-              ) : milestones.length > 0 ? (
-                milestones.map((user, i) => {
+              ) : profiles.length > 0 ? (
+                profiles.map((user, i) => {
+                  console.log("ada user ga sih");
+                  console.log(user);
                   return (
                     <Card
                       key={i}
                       onClick={() => {
-                        router.push(`/creator/${user.addr}`);
+                        router.push(
+                          `/creator/${uint256ToBN(user.creator_id).toString()}`
+                        );
                       }}
                       className="m-3 justify-content-center shadow-lg border border-white"
                       style={{
@@ -131,18 +243,24 @@ export default function Users() {
                       </div>
 
                       <Card.Body>
-                        <Card.Title>{text_truncate(user.name, 15)}</Card.Title>
+                        <Card.Title>
+                          {text_truncate(feltArrToStr([user.name]), 15)}
+                        </Card.Title>
                         <Card.Text
                           style={{
                             height: "75px",
                           }}
                         >
-                          {text_truncate(user.addr, 15)}
+                          {text_truncate(feltArrToStr([user.name]), 15)}
                         </Card.Text>{" "}
                         <div>
                           <Button
                             onClick={() => {
-                              router.push(`/creator/${user.addr}`);
+                              router.push(
+                                `/creator/${uint256ToBN(
+                                  user.creator_id
+                                ).toString()}`
+                              );
                             }}
                             variant="primary"
                           >

@@ -162,6 +162,25 @@ export default function Dashboard() {
     ],
   });
 
+  const { execute: setCollectibleAddress } = useStarknetExecute({
+    calls: [
+      {
+        contractAddress: ciriAddress,
+        entrypoint: "setCiriAddress",
+        calldata: [
+          "2632642404422407010450225779652345213841384789927075867061545309834131335851",
+        ],
+      },
+      {
+        contractAddress: ciriAddress,
+        entrypoint: "setCollectibleAddress",
+        calldata: [
+          "1936367593231708560178912618266606920364778007735837264700331486930069965461",
+        ],
+      },
+    ],
+  });
+
   // useEffect(() => {
   //   const interval = setInterval(refresh, 5000);
   //   return () => clearInterval(interval);
@@ -314,7 +333,8 @@ export default function Dashboard() {
             <span className="navbar-text">
               <button
                 onClick={() => {
-                  setPage("Overlays");
+                  // setPage("Overlays");
+                  setCollectibleAddress();
                 }}
                 className="vvd shadow-lg w-50 mb-3"
               >

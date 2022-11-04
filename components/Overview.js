@@ -129,56 +129,27 @@ export default function Overview() {
     ],
   });
 
+  const { execute: withdraw_fund } = useStarknetExecute({
+    calls: [
+      {
+        contractAddress: ciriAddress,
+        entrypoint: "withdraw",
+        calldata: [],
+      },
+    ],
+  });
+
   useEffect(() => {
     if (status == "connected") {
       if (receipt && receipt.status == "ACCEPTED_ON_L2") {
         setIsUpdating(false);
+        setWithdrawing(false);
         refreshMilestone();
       }
     } else {
       // setCreator(false);
     }
   }, [receipt]);
-
-  // const { runContractFunction: getFunds } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "getFunds",
-  //   params: {
-  //     creator: account,
-  //   },
-  // });
-
-  // const { runContractFunction: getDonatorsCount } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "getDonatorsCount",
-  //   params: {
-  //     creator: account,
-  //   },
-  // });
-
-  // const { runContractFunction: getMilestones } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "getMilestones",
-  //   params: {
-  //     creator: account,
-  //   },
-  // });
-
-  // const { runContractFunction: withdrawFund } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "withdrawFunds",
-  //   onError: (error) => setWithdrawing(false),
-  //   onSuccess: async (success) => {
-  //     await success.wait(1);
-  //     updateMilestones();
-  //     setWithdrawing(false);
-  //     updateFunds();
-  //   },
-  // });
 
   async function updateFunds() {
     // let fundsData = await getFunds();
@@ -192,30 +163,6 @@ export default function Overview() {
     console.log("loggin_milestone");
     console.log(milestone);
   }
-
-  // async function updateDonatorsCount() {
-  //   let donatorsData = await getDonatorsCount();
-  //   donatorsData = donatorsData.toString();
-  //   setdonatorsCount(donatorsData);
-  // }
-
-  // async function updateMilestones() {
-  //   setIsFetching(true);
-  //   let milestonesData = await getMilestones();
-
-  //   let dataAfter = [];
-
-  //   await Promise.all(
-  //     milestonesData.map(async (data, index) => {
-  //       let tokenURIResponse = await (await fetch(data)).json();
-
-  //       dataAfter.push(tokenURIResponse);
-  //     })
-  //   );
-
-  //   setMilestones(dataAfter);
-  //   setIsFetching(false);
-  // }
 
   useEffect(() => {
     if (status === "connected") {
@@ -253,15 +200,15 @@ export default function Overview() {
             >
               <h4 className="pb-2">Withdraw</h4>
               <h2 className="pb-2">
-                {uint256ToBN(profiles.funds).toString()} ETH
+                {(uint256ToBN(profiles.funds) / 10 ** 18).toString()} ETH
               </h2>
               <span className=" navbar-text justify-content-center">
                 <button
                   disabled={isWithdrawing}
-                  // onClick={async () => {
-                  //   setWithdrawing(true);
-                  //   await withdrawFund();
-                  // }}
+                  onClick={async () => {
+                    setWithdrawing(true);
+                    withdraw_fund().then((tx) => setHash(tx.transaction_hash));
+                  }}
                   className="vvd shadow-md"
                 >
                   <span>{isWithdrawing ? "Withdrawing.." : "Withdraw"}</span>
