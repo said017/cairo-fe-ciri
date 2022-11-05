@@ -20,6 +20,7 @@ import { useMoralis, useWeb3Contract } from "react-moralis";
 import { utils } from "ethers";
 import Loader from "./Loader";
 import ciri_vote_Abi from "../constants/abis/ciri_vote.json";
+import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
 import { toHex, toHexString, toFelt } from "starknet/utils/number";
 import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
 import {
@@ -68,7 +69,7 @@ export default function Polling() {
     time_to_lock: "1",
   });
 
-  const milestoneAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
+  const ciriAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
   const collectibleAddress =
     process.env.NEXT_PUBLIC_COLLECTIBLE_CONTRACT_ADDRESS;
   const voteAddress = process.env.NEXT_PUBLIC_VOTE_CONTRACT_ADDRESS;
@@ -83,6 +84,24 @@ export default function Polling() {
   //   },
   //   onError: (error) => {},
   // });
+  const { contract: ciriContract } = useContract({
+    address: ciriAddress,
+    abi: ciri_profile_Abi,
+  });
+
+  const {
+    data: tokenId,
+    loading: loadingTokenId,
+    error: errorTokenId,
+    refresh: refreshTokenId,
+  } = useStarknetCall({
+    contract: ciriContract,
+    method: "tokenOfOwnerByIndex",
+    args: [toFelt(address), bnToUint256("0")],
+    options: {
+      watch: false,
+    },
+  });
 
   /**
    * Converts an array of utf-8 numerical short strings into a readable string
@@ -194,6 +213,7 @@ export default function Polling() {
   useEffect(() => {
     if (status === "connected") {
       updatePollings();
+      refreshTokenId();
     }
   }, [status, account, num]);
 
@@ -288,18 +308,20 @@ export default function Polling() {
                       key={i}
                       className="w-50 card p-4 m-2 justify-content-center shadow-lg"
                     >
-                      <div className="d-flex justify-content-end">
-                        <Button
-                          onClick={() => {
-                            navigator.clipboard.writeText(
-                              `https://ciriverse.xyz/polling?addr=${account}&id=${i}`
-                            );
-                          }}
-                          variant="outline-primary"
-                        >
-                          Copy Link
-                        </Button>
-                      </div>
+                      {tokenId && (
+                        <div className="d-flex justify-content-end">
+                          <Button
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                `http://localhost:3000/polling?addr=${tokenId.tokenId.low.toString()}&id=${i}`
+                              );
+                            }}
+                            variant="outline-primary"
+                          >
+                            Copy Link
+                          </Button>
+                        </div>
+                      )}
 
                       <h3 className="pb-3">
                         {isOngoing ? "Ongoing" : "Expired"}

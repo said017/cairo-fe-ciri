@@ -24,7 +24,7 @@ import CollectibleView from "./CollectibleView";
 import PollingView from "./PollingView";
 import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
 import ciri_token_Abi from "../constants/abis/Ciri_ERC20.json";
-// let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
+let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
 
 import { toHex, toHexString, toFelt } from "starknet/utils/number";
 import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
@@ -278,6 +278,11 @@ export default function CreatorView({ addrs }) {
         // refreshCollectibles();
         refreshBalance();
         refreshCount();
+        if (isDonating) {
+          sendSocket(
+            `${address} donate : ${formInput.price} ETH. Message : ${formInput.message}`
+          );
+        }
         setIsDonating(false);
         setHash(undefined);
       }
@@ -286,13 +291,13 @@ export default function CreatorView({ addrs }) {
     }
   }, [receipt]);
 
-  // function sendSocket(message) {
-  //   socket.emit("sending-donate", `${addr}`, message);
-  // }
+  function sendSocket(message) {
+    socket.emit("sending-donate", `${addr}`, message);
+  }
 
-  // function sendSocketNFT(message) {
-  //   socket.emit("sending-nft", `${addr}`, message);
-  // }
+  function sendSocketNFT(message) {
+    socket.emit("sending-nft", `${addr}`, message);
+  }
 
   async function mintMilestone(mlsId) {
     // create the items and list them on the marketplace

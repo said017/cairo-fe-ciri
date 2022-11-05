@@ -168,14 +168,14 @@ export default function Dashboard() {
         contractAddress: ciriAddress,
         entrypoint: "setCiriAddress",
         calldata: [
-          "2632642404422407010450225779652345213841384789927075867061545309834131335851",
+          "1621617476554746761012955328360487266093235295711967375085895067058416810487",
         ],
       },
       {
         contractAddress: ciriAddress,
         entrypoint: "setCollectibleAddress",
         calldata: [
-          "1936367593231708560178912618266606920364778007735837264700331486930069965461",
+          "158001876634394017517865398725947939774130522959886397164350264160433573443",
         ],
       },
     ],
@@ -333,8 +333,8 @@ export default function Dashboard() {
             <span className="navbar-text">
               <button
                 onClick={() => {
-                  // setPage("Overlays");
-                  setCollectibleAddress();
+                  setPage("Overlays");
+                  // setCollectibleAddress();
                 }}
                 className="vvd shadow-lg w-50 mb-3"
               >

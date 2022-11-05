@@ -124,14 +124,10 @@
         "data": [
             {
                 "name": "account",
-                "type": "felt"
+                "type": "Uint256"
             },
             {
                 "name": "name",
-                "type": "felt"
-            },
-            {
-                "name": "pic",
                 "type": "felt"
             }
         ],

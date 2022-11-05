@@ -35,7 +35,7 @@ import {
   useTransactionReceipt,
 } from "@starknet-react/core";
 import { Contract, Provider } from "starknet";
-// let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
+let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
 
 export default function CollectibleView() {
   const router = useRouter();
@@ -127,7 +127,11 @@ export default function CollectibleView() {
     if (status == "connected") {
       if (receipt && receipt.status == "ACCEPTED_ON_L2") {
         // refreshCollectibles();
-
+        if (isMinting) {
+          sendSocketNFT(
+            `Congrats !. ${address} Mint Collectible NFTs ${buyIndex}`
+          );
+        }
         setIsMinting(false);
         setHash(undefined);
         updateAllData();
@@ -319,9 +323,10 @@ export default function CollectibleView() {
     }
   }
 
-  // function sendSocketNFT(message) {
-  //   socket.emit("sending-nft", `${addr}`, message);
-  // }
+  function sendSocketNFT(message) {
+    socket.emit("sending-nft", `${addr}`, message);
+  }
+
   useEffect(() => {
     if (isBuy) {
       mintCollectible();
