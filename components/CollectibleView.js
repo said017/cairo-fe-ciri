@@ -281,7 +281,7 @@ export default function CollectibleView() {
     calls: [
       {
         contractAddress:
-          "0x62230ea046a9a5fbc261ac77d03c8d41e5d442db2284587570ab46455fd2488",
+          "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
         entrypoint: "increaseAllowance",
         calldata: [
           toFelt(ciriAddress),
@@ -431,7 +431,7 @@ export default function CollectibleView() {
                           } else {
                             // Aspect link (PLEASE UPDATE)
                             window.open(
-                              `https://baobab.scope.klaytn.com/account/0x01Ebab7B1D0Ae2064311E7054844CE5c8dB96d96?tabId=txList`,
+                              `https://testnet.aspect.co/0x05b3ec22c6dcdb0fefad69df026939d26ae86ac9a710c9070cbc2593bece6465`,
                               "_blank"
                             );
                           }

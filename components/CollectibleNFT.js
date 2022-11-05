@@ -429,7 +429,7 @@ export default function CollectibleNFT() {
                           <Button
                             onClick={() =>
                               window.open(
-                                `https://baobab.scope.klaytn.com/account/0x01Ebab7B1D0Ae2064311E7054844CE5c8dB96d96?tabId=txList`,
+                                `https://testnet.aspect.co/0x05b3ec22c6dcdb0fefad69df026939d26ae86ac9a710c9070cbc2593bece6465`,
                                 "_blank"
                               )
                             }
