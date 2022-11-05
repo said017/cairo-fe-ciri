@@ -133,8 +133,8 @@ export default function Polling() {
     voteAddress,
     new Provider({
       sequencer: {
-        baseUrl: "http://localhost:5050",
-        // network: "goerli-alpha",
+        // baseUrl: "http://localhost:5050",
+        network: "goerli-alpha",
       },
       // sequencer:
       //   "http://localhost:5050/feeder_gateway/call_contract?blockNumber=pending",

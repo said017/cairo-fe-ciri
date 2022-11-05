@@ -147,12 +147,12 @@ export default function Overlays() {
               className="border border-white p-3 m-3 shadow-lg"
             >
               <h4 className="pb-2">Donate Overlay</h4>
-              <p className="pb-2">{`http://localhost:3000/notification?addr=${tokenId.tokenId.low.toString()}&mint=false`}</p>
+              <p className="pb-2">{`https://cairo-fe-ciri.vercel.app/notification?addr=${tokenId.tokenId.low.toString()}&mint=false`}</p>
               <span className=" navbar-text justify-content-center">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `http://localhost:3000/notification?addr=${tokenId.tokenId.low.toString()}&mint=false`
+                      `https://cairo-fe-ciri.vercel.app/notification?addr=${tokenId.tokenId.low.toString()}&mint=false`
                     );
                   }}
                   className="vvd shadow-md"
@@ -172,12 +172,12 @@ export default function Overlays() {
               className="border border-white p-3 m-3 shadow-lg"
             >
               <h4 className="pb-2">Milestone NFT Mint Overlay</h4>
-              <p className="pb-2">{`http://localhost:3000/notification?addr=${tokenId.tokenId.low.toString()}&mint=true`}</p>
+              <p className="pb-2">{`https://cairo-fe-ciri.vercel.app/notification?addr=${tokenId.tokenId.low.toString()}&mint=true`}</p>
               <span className=" navbar-text justify-content-center">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `http://localhost:3000/notification?addr=${tokenId.tokenId.low.toString()}&mint=true`
+                      `https://cairo-fe-ciri.vercel.app/notification?addr=${tokenId.tokenId.low.toString()}&mint=true`
                     );
                   }}
                   className="vvd shadow-md"
@@ -209,7 +209,7 @@ export default function Overlays() {
                 <QRCode
                   size={256}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                  value={`http://localhost:3000/creator/${tokenId.tokenId.low.toString()}`}
+                  value={`https://cairo-fe-ciri.vercel.app/creator/${tokenId.tokenId.low.toString()}`}
                   viewBox={`0 0 256 256`}
                 />
               </div>
@@ -219,7 +219,7 @@ export default function Overlays() {
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `http://localhost:3000/qrlink?addr=${tokenId.tokenId.low.toString()}`
+                      `https://cairo-fe-ciri.vercel.app/qrlink?addr=${tokenId.tokenId.low.toString()}`
                     );
                   }}
                   className="vvd shadow-md"
