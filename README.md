@@ -2,7 +2,7 @@
 
 **Ciriverse Architecture**
 
-![ Ciriverse Architecture](https://i.ibb.co/WWtG0vj/Ciriverse-Architecture.png)
+![ Ciriverse Architecture](https://i.ibb.co/X5XQT4t/ciri-architecture.png)
 
 First, run install dependencies the development server:
 
@@ -18,8 +18,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Live Website
 
-[Website](https://www.ciriverse.xyz/)
+[Soon]()
 
 ![ Ciriverse Banner](https://i.ibb.co/VNgVKnv/Cover.png)
 
-[Pitch Deck](https://drive.google.com/file/d/18VjEDSS1y-6C11xNri4OFS7yWj61ot1N/view?usp=sharing)
+[Pitch Deck](https://drive.google.com/file/d/1Y_OSwF28eWIayRYb-wGpe8FxGxGuLYrs/view?usp=sharing)
