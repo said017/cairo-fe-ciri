@@ -99,7 +99,7 @@ export default function CreatorView({ addrs }) {
     method: "get_profile_by_id",
     args: [[toFelt(addr), 0]],
     options: {
-      watch: true,
+      watch: false,
     },
   });
 
@@ -113,7 +113,7 @@ export default function CreatorView({ addrs }) {
     method: "get_donators_count_by_id",
     args: [[toFelt(addr), 0]],
     options: {
-      watch: true,
+      watch: false,
     },
   });
 
@@ -127,7 +127,7 @@ export default function CreatorView({ addrs }) {
     method: "get_profile_milestone",
     args: [[toFelt(addr), 0]],
     options: {
-      watch: true,
+      watch: false,
     },
   });
 
@@ -212,6 +212,7 @@ export default function CreatorView({ addrs }) {
     if (status == "connected" && router.isReady) {
       refreshBalance();
       refreshCount();
+      refreshMilestone();
       console.log("profiles nih");
       console.log(profiles);
     }
@@ -251,25 +252,6 @@ export default function CreatorView({ addrs }) {
     valueToSend = utils.parseEther(price).toString();
 
     await donate_fund().then((tx) => setHash(tx.transaction_hash));
-
-    // await runContractFunction({
-    //   params: {
-    //     abi: milestoneAbi,
-    //     contractAddress: milestoneAddress,
-    //     functionName: "donate",
-    //     msgValue: valueToSend,
-    //     params: {
-    //       creator: addr,
-    //     },
-    //   },
-    //   onError: (error) => {},
-    //   onSuccess: async (success) => {
-    //     await success.wait(1);
-    //     sendSocket(`${account} donate : ${price} KLAY. Message : ${message}`);
-    //     updateMilestones();
-    //   },
-    //   onComplete: (success) => {},
-    // });
   }
 
   useEffect(() => {
@@ -278,6 +260,7 @@ export default function CreatorView({ addrs }) {
         // refreshCollectibles();
         refreshBalance();
         refreshCount();
+        refreshMilestone();
         if (isDonating) {
           sendSocket(
             `${address} donate : ${formInput.price} ETH. Message : ${formInput.message}`
@@ -299,42 +282,21 @@ export default function CreatorView({ addrs }) {
     socket.emit("sending-nft", `${addr}`, message);
   }
 
-  async function mintMilestone(mlsId) {
-    // create the items and list them on the marketplace
+  // async function mintMilestone(mlsId) {
+  //   // create the items and list them on the marketplace
 
-    setIsMinting(true);
+  //   setIsMinting(true);
 
-    // we want to create the token
-    try {
-      // transaction = await contract.makeMarketItem(nftaddress, tokenId, price, {value: listingPrice})
-      // await transaction.wait()
-      // runContractFunction({
-      //   params: {
-      //     abi: milestoneAbi,
-      //     contractAddress: milestoneAddress,
-      //     functionName: "mintDonatorNFT",
-      //     params: { creator: addr, milestoneId: mlsId },
-      //   },
-      //   onError: (error) => {},
-      //   onSuccess: async (success) => {
-      //     await success.wait(1);
-      //     setIsMinting(false);
-      //     sendSocketNFT(
-      //       `Congrats !. ${account} Mint Milestone NFT: ${mlsId + 1}`
-      //     );
-      //     updateMilestones();
-      //     //   updateUI();
-      //   },
-      // });
-      // receipt can also be a new contract instance, when coming from a "contract.deploy({...}).send()"
-    } catch {
-      console.error("Too long waited to mint, go to main page");
+  //   // we want to create the token
+  //   try {
+  //   } catch {
+  //     console.error("Too long waited to mint, go to main page");
 
-      setIsMinting(false);
-    }
+  //     setIsMinting(false);
+  //   }
 
-    // list the item for sale on the marketplace
-  }
+  //   // list the item for sale on the marketplace
+  // }
 
   return (
     <section>

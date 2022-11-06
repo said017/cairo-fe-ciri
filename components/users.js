@@ -34,42 +34,7 @@ export default function Users() {
   const router = useRouter();
 
   const ciriAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
-  // const { runContractFunction: getFunds } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "getFunds",
-  //   params: {
-  //     creator: account,
-  //   },
-  // });
 
-  // const { runContractFunction: getDonatorsCount } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "getDonatorsCount",
-  //   params: {
-  //     creator: account,
-  //   },
-  // });
-
-  // const { runContractFunction: getCreators } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: ciriAddress,
-  //   functionName: "getCreators",
-  // });
-
-  // async function updateFunds() {
-  //   let fundsData = await getFunds();
-  //   fundsData = utils.formatUnits(fundsData, "ether");
-
-  //   setFunds(fundsData);
-  // }
-
-  // async function updateDonatorsCount() {
-  //   let donatorsData = await getDonatorsCount();
-  //   donatorsData = utils.formatEther(donatorsData);
-  //   setdonatorsCount(donatorsData);
-  // }
   const ciri_profile_contract = new Contract(
     ciri_profile_Abi,
     ciriAddress,
@@ -110,7 +75,7 @@ export default function Users() {
     method: "get_profile_counter",
     args: [],
     options: {
-      watch: true,
+      watch: false,
     },
   });
 
@@ -130,19 +95,6 @@ export default function Users() {
       console.log(num.number);
       console.log(uint256ToBN(num.number).toString());
       for (let i = 0; i < parseInt(uint256ToBN(num.number).toString()); i++) {
-        // let data = await runContractFunction({
-        //   params: {
-        //     abi: daoAbi,
-        //     contractAddress: daoAddress,
-        //     functionName: "s_proposals",
-        //     params: {
-        //       creator: account,
-        //       index: i,
-        //     },
-        //   },
-        //   onError: (error) => {},
-        //   onSuccess: async (success) => {},
-        // });
         const data = await ciri_profile_contract.get_profile_by_id(
           bnToUint256(i + 1)
         );

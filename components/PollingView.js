@@ -126,7 +126,7 @@ export default function PollingView() {
     method: "get_token_to_mint",
     args: [toFelt(address)],
     options: {
-      watch: true,
+      watch: false,
     },
   });
 
@@ -140,7 +140,7 @@ export default function PollingView() {
     method: "balanceOf",
     args: [toFelt(address)],
     options: {
-      watch: true,
+      watch: false,
     },
   });
 

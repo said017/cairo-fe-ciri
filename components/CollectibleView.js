@@ -141,29 +141,6 @@ export default function CollectibleView() {
     }
   }, [receipt]);
 
-  // const {
-  //   data: tokenId,
-  //   loading: loadingTokenId,
-  //   error: errorTokenId,
-  //   refresh: refreshTokenId,
-  // } = useStarknetCall({
-  //   contract,
-  //   method: "tokenOfOwnerByIndex",
-  //   args: [toFelt(address), bnToUint256("0")],
-  //   options: {
-  //     watch: false,
-  //   },
-  // });
-
-  // const { runContractFunction: getCollectibles } = useWeb3Contract({
-  //   abi: collectibleAbi,
-  //   contractAddress: collectibleAddress,
-  //   functionName: "getCollectibles",
-  //   params: {
-  //     creator: addr,
-  //   },
-  // });
-
   async function updateAllData() {
     setIsFetching(true);
     await updateCollectibles();
@@ -245,36 +222,11 @@ export default function CollectibleView() {
           });
           console.log(tokenURIResponse);
         }
-        // await Promise.all(
-        //   col_counts.collectible.map(async (data, i) => {
-        //     console.log("masuk sini ga ayah");
-        //     const uri = await ciri_profile_contract.get_collectible_img_id(
-        //       [tokenId.low.toString(), tokenId.high.toString()],
-        //       // collectible_data.collectible[0].profile_id,
-        //       i + 1
-        //     );
-        //     console.log(uri);
-
-        //     const tokenURIResponse = await (
-        //       await fetch(feltArrToStr(uri.uri_img))
-        //     ).json();
-        //     dataAfter.push(tokenURIResponse);
-        //     console.log(tokenURIResponse);
-        //   })
-        // );
         setCollectibles(dataAfter);
         setIsFetching(false);
       }
     }
     setIsFetching(false);
-    // console.log(tokenId);
-    // console.log(loadingTokenId);
-    // if (tokenId) {
-    //   console.log("TokenId");
-    //   console.log(tokenId.tokenId.low.toString());
-    //   setTokenLow(tokenId.tokenId.low.toString());
-    //   setTokenHigh(tokenId.tokenId.high.toString());
-    // }
   }
 
   const { execute: mintCollectibleCall } = useStarknetExecute({

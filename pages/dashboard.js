@@ -181,29 +181,6 @@ export default function Dashboard() {
     ],
   });
 
-  // useEffect(() => {
-  //   const interval = setInterval(refresh, 5000);
-  //   return () => clearInterval(interval);
-  // }, [refresh]);
-
-  // const { runContractFunction: seeRegister } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "getCreator",
-  //   params: {
-  //     creator: account,
-  //   },
-  // });
-
-  // const { runContractFunction: isCreator } = useWeb3Contract({
-  //   abi: milestoneAbi,
-  //   contractAddress: milestoneAddress,
-  //   functionName: "isCreator",
-  //   params: {
-  //     _address: account,
-  //   },
-  // });
-
   function feltToString(felt) {
     const newStrB = Buffer.from(felt.toString(16), "hex");
     return newStrB.toString();
