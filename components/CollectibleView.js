@@ -383,7 +383,7 @@ export default function CollectibleView() {
                           } else {
                             // Aspect link (PLEASE UPDATE)
                             window.open(
-                              `https://testnet.aspect.co/0x05b3ec22c6dcdb0fefad69df026939d26ae86ac9a710c9070cbc2593bece6465`,
+                              `https://testnet.aspect.co/collection/0x05b3ec22c6dcdb0fefad69df026939d26ae86ac9a710c9070cbc2593bece6465`,
                               "_blank"
                             );
                           }
