@@ -216,7 +216,7 @@ export default function CreatorView({ addrs }) {
       console.log("profiles nih");
       console.log(profiles);
     }
-  }, [status, account, router.isReady]);
+  }, [status, address, router.isReady]);
 
   useEffect(() => {
     if (status == "connected" && router.isReady) {
@@ -224,7 +224,7 @@ export default function CreatorView({ addrs }) {
       console.log("profiles nih");
       console.log(profiles);
     }
-  }, [router.isReady, profiles_data, donators_count]);
+  }, [profiles_data, donators_count]);
 
   function text_truncate(str, length, ending) {
     if (length == null) {

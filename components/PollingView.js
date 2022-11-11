@@ -278,7 +278,7 @@ export default function PollingView() {
       refreshciriBalance();
       updateAllData();
     }
-  }, [status, account, router.isReady]);
+  }, [status, address, router.isReady]);
 
   useEffect(() => {
     if (isVoting) {

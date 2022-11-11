@@ -259,7 +259,7 @@ export default function CollectibleView() {
     if (status == "connected" && router.isReady) {
       updateAllData();
     }
-  }, [status, account, router.isReady]);
+  }, [status, address, router.isReady]);
 
   function text_truncate(str, length, ending) {
     if (length == null) {

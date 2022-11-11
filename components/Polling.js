@@ -63,6 +63,7 @@ export default function Polling() {
   const [collectibles, setCollectibles] = useState([]);
   const [isFetching, setIsFetching] = useState(false);
   const [hash, setHash] = useState(undefined);
+  const [executeIndex, setExecuteIndex] = useState(0);
   const [formInput, updateFormInput] = useState({
     option1: "",
     option2: "",
@@ -140,6 +141,32 @@ export default function Polling() {
       //   "http://localhost:5050/feeder_gateway/call_contract?blockNumber=pending",
     })
   );
+
+  const { execute: executeProposal } = useStarknetExecute({
+    calls: [
+      // {
+      //   contractAddress:
+      //     "0x62230ea046a9a5fbc261ac77d03c8d41e5d442db2284587570ab46455fd2488",
+      //   entrypoint: "increaseAllowance",
+      //   calldata: [
+      //     toFelt(ciriAddress),
+      //     (parseFloat(formInput.price) * 10 ** 18).toString(),
+      //     0,
+      //   ],
+      // },
+      {
+        contractAddress: voteAddress,
+        entrypoint: "execute_proposal",
+        calldata: [toFelt(tokenId), 0, executeIndex],
+      },
+    ],
+  });
+
+  useEffect(() => {
+    if (isExecuting) {
+      executeProposal().then((tx) => setHash(tx.transaction_hash));
+    }
+  }, [isExecuting]);
 
   const {
     data: receipt,
@@ -248,6 +275,7 @@ export default function Polling() {
         console.log("masuk sini polling");
         setIsMinting(false);
         refreshNum();
+        setExecuting(false);
         setHash(undefined);
       }
     } else {
@@ -365,6 +393,8 @@ export default function Polling() {
                           //     //   updateUI();
                           //   },
                           // });
+                          setExecuteIndex(i);
+                          setExecuting(true);
                         }}
                       >
                         {isExecuting ? "Executing.." : "Execute"}
