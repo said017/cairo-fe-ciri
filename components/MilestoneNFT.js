@@ -325,7 +325,7 @@ export default function MilestoneNFT() {
             </div> */}
             <input
               //   disabled={!onSale}
-              placeholder="Milestone in Klay"
+              placeholder="Milestone in ETH"
               className="mt-2 border rounded p-4 w-100"
               type="text"
               name="price"

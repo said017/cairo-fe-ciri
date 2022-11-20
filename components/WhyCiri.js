@@ -50,8 +50,8 @@ export default function WhyCiri() {
                       <Tab.Pane eventKey="first">
                         <p>
                           Simple account creation and NFTs setup (No Code!).
-                          Just provide the art and Ciriverse, powered by Klaytn
-                          will take care the rest.
+                          Just provide the art and Ciriverse, powered by
+                          StarkNet will take care the rest.
                         </p>
                       </Tab.Pane>
                       <Tab.Pane eventKey="second">
