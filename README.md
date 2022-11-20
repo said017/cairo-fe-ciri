@@ -18,7 +18,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Live Website
 
-[Live Demo](https://cairo-fe-ciri.vercel.app)
+[Live Demo](https://www.ciriverse.xyz)
 
 ![ Ciriverse Banner](https://i.ibb.co/VNgVKnv/Cover.png)
 
