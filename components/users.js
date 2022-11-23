@@ -4,13 +4,11 @@ import "animate.css";
 
 import { create as ipfsHttpClient } from "ipfs-http-client";
 
-import { useMoralis, useWeb3Contract } from "react-moralis";
-import milestoneAbi from "../constants/MilestoneNFTv2.json";
 import { useEffect, useState } from "react";
 import { utils } from "ethers";
 import Loader from "./Loader";
 import { useRouter } from "next/router";
-import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_profile_Abi from "../constants/abis/ciri_profile.json";
 import { toHex, toHexString, toFelt } from "starknet/utils/number";
 import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
 import {

@@ -13,16 +13,12 @@ import "animate.css";
 
 import { create as ipfsHttpClient } from "ipfs-http-client";
 
-import { useMoralis, useWeb3Contract } from "react-moralis";
-import milestoneAbi from "../constants/MilestoneNFTv2.json";
-import collectibleAbi from "../constants/CollectibleNFT.json";
-import daoAbi from "../constants/CiriverseDAO.json";
 import { useEffect, useState } from "react";
 import { utils } from "ethers";
 import Loader from "./Loader";
 import { useRouter } from "next/router";
 import ciri_vote_Abi from "../constants/abis/ciri_vote.json";
-import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_profile_Abi from "../constants/abis/ciri_profile.json";
 import ciri_token_Abi from "../constants/abis/Ciri_ERC20.json";
 import { toHex, toHexString, toFelt } from "starknet/utils/number";
 import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";

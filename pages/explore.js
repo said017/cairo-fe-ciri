@@ -4,7 +4,6 @@ import { Container, Row, Col, ListGroup } from "react-bootstrap";
 // import { useMoralis, useWeb3Contract, useChain } from "react-moralis";
 import { utils } from "ethers";
 
-import milestoneAbi from "../constants/MilestoneNFTv2.json";
 import { useEffect, useState } from "react";
 import Mint from "../components/Mint";
 import Overview from "../components/Overview";

@@ -336,11 +336,11 @@
                 "type": "felt"
             },
             {
-                "name": "base_token_uri_len",
+                "name": "token_uri_len",
                 "type": "felt"
             },
             {
-                "name": "base_token_uri",
+                "name": "token_uri",
                 "type": "felt*"
             }
         ],

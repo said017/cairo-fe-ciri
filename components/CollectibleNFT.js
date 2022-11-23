@@ -13,11 +13,9 @@ import "animate.css";
 import TrackVisibility from "react-on-screen";
 import { useState, useEffect } from "react";
 import { create as ipfsHttpClient } from "ipfs-http-client";
-import milestoneAbi from "../constants/MilestoneNFTv2.json";
-import collectibleAbi from "../constants/CollectibleNFT.json";
 import { utils } from "ethers";
 import Loader from "./Loader";
-import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_profile_Abi from "../constants/abis/ciri_profile.json";
 import { toHex, toHexString, toFelt } from "starknet/utils/number";
 import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
 import {
@@ -429,7 +427,7 @@ export default function CollectibleNFT() {
                           <Button
                             onClick={() =>
                               window.open(
-                                `https://testnet.aspect.co/collection/0x05b3ec22c6dcdb0fefad69df026939d26ae86ac9a710c9070cbc2593bece6465`,
+                                `https://testnet.aspect.co/collection/0x06e7d4f14ec221b02d82477101d4d53094b543f550a51a641855d2c9d32626d5`,
                                 "_blank"
                               )
                             }

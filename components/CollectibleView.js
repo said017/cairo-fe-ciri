@@ -14,14 +14,11 @@ import "animate.css";
 
 import { create as ipfsHttpClient } from "ipfs-http-client";
 
-import { useMoralis, useWeb3Contract } from "react-moralis";
-import milestoneAbi from "../constants/MilestoneNFTv2.json";
-import collectibleAbi from "../constants/CollectibleNFT.json";
 import { useEffect, useState } from "react";
 import { utils } from "ethers";
 import Loader from "./Loader";
 import { useRouter } from "next/router";
-import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_profile_Abi from "../constants/abis/ciri_profile.json";
 import { toHex, toHexString, toFelt } from "starknet/utils/number";
 import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
 import {
@@ -234,6 +231,7 @@ export default function CollectibleView() {
       {
         contractAddress:
           "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        // "0x62230EA046A9A5FBC261AC77D03C8D41E5D442DB2284587570AB46455FD2488",
         entrypoint: "increaseAllowance",
         calldata: [
           toFelt(ciriAddress),
@@ -383,7 +381,7 @@ export default function CollectibleView() {
                           } else {
                             // Aspect link (PLEASE UPDATE)
                             window.open(
-                              `https://testnet.aspect.co/collection/0x05b3ec22c6dcdb0fefad69df026939d26ae86ac9a710c9070cbc2593bece6465`,
+                              `https://testnet.aspect.co/collection/0x06e7d4f14ec221b02d82477101d4d53094b543f550a51a641855d2c9d32626d5`,
                               "_blank"
                             );
                           }

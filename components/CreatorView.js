@@ -14,15 +14,13 @@ import "animate.css";
 
 import { create as ipfsHttpClient } from "ipfs-http-client";
 
-import { useMoralis, useWeb3Contract } from "react-moralis";
-import milestoneAbi from "../constants/MilestoneNFTv2.json";
 import { useEffect, useState } from "react";
 import { utils } from "ethers";
 import Loader from "./Loader";
 import { useRouter } from "next/router";
 import CollectibleView from "./CollectibleView";
 import PollingView from "./PollingView";
-import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_profile_Abi from "../constants/abis/ciri_profile.json";
 import ciri_token_Abi from "../constants/abis/Ciri_ERC20.json";
 let socket = io(process.env.NEXT_PUBLIC_SOCKET_URL);
 
@@ -136,6 +134,7 @@ export default function CreatorView({ addrs }) {
       {
         contractAddress:
           "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7",
+        // "0x62230EA046A9A5FBC261AC77D03C8D41E5D442DB2284587570AB46455FD2488",
         entrypoint: "increaseAllowance",
         calldata: [
           toFelt(ciriAddress),

@@ -4,7 +4,7 @@ import Head from "next/head";
 // import MessageForm from "../components/MessageForm";
 import { useMoralis, useWeb3Contract, useChain } from "react-moralis";
 import { ethers } from "ethers";
-import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_profile_Abi from "../constants/abis/ciri_profile.json";
 import { useEffect, useState } from "react";
 import Mint from "../components/Mint";
 import Overview from "../components/Overview";
@@ -52,6 +52,7 @@ export default function Dashboard() {
     "https://ipfs.io/ipfs/QmV1RmdU9TXVztvdBcUPe5v2qfQWL5pfxbrGuipiwUUAJW"
   );
   const [fileUrlFelt, setFileUrlFelt] = useState([]);
+  const [nameUrlFelt, setNameUrlFelt] = useState([]);
   const { chain } = useNetwork();
   const [isUploading, setUploading] = useState(false);
   const [isRegistering, setRegistering] = useState(false);
@@ -157,6 +158,8 @@ export default function Dashboard() {
           parseInt(toFelt("0x" + ConvertStringToHex(formInput.name))),
           fileUrlFelt.length,
           ...fileUrlFelt,
+          nameUrlFelt.length,
+          ...nameUrlFelt,
         ],
       },
     ],
@@ -168,14 +171,14 @@ export default function Dashboard() {
         contractAddress: ciriAddress,
         entrypoint: "setCiriAddress",
         calldata: [
-          "1621617476554746761012955328360487266093235295711967375085895067058416810487",
+          "2366256821942373016249728738264878745410001250966383242796770749056454187431",
         ],
       },
       {
         contractAddress: ciriAddress,
         entrypoint: "setCollectibleAddress",
         calldata: [
-          "158001876634394017517865398725947939774130522959886397164350264160433573443",
+          "3123488439330291349219593442130080993199065783282186378195777558217725716181",
         ],
       },
     ],
@@ -233,6 +236,28 @@ export default function Dashboard() {
   }, [account, status, loading, error, name, balance]);
 
   useEffect(() => {
+    if (nameUrlFelt.length > 0) {
+      registerCreatorCall();
+    }
+  }, [nameUrlFelt]);
+
+  async function registerCreatorCall() {
+    // create the items and list them on the marketplace
+    setRegistering(true);
+
+    // we want to create the token
+    try {
+      await registerCreator().then((tx) => setHash(tx.transaction_hash));
+    } catch {
+      console.error("Too long waited to mint, go to main page");
+
+      setRegistering(false);
+    }
+    setNameUrlFelt([]);
+    setRegistering(false);
+  }
+
+  useEffect(() => {
     if (status == "connected") {
       refreshBalance();
     } else {
@@ -241,8 +266,13 @@ export default function Dashboard() {
   }, [address, account]);
 
   useEffect(() => {
-    if (status == "connected" && receipt.status == "ACCEPTED_ON_L2") {
+    if (
+      status == "connected" &&
+      receipt &&
+      receipt.status == "ACCEPTED_ON_L2"
+    ) {
       refreshBalance();
+      setHash(undefined);
     } else {
       // setCreator(false);
     }
@@ -391,7 +421,8 @@ export default function Dashboard() {
                     // disabled={creatorStatus || isUploading || isRegistering}
                     onClick={async () => {
                       if (!formInput.name || !fileUrl) return;
-                      setRegistering(true);
+                      // setRegistering(true);
+                      setUploading(true);
                       // await runContractFunction({
                       //   params: {
                       //     abi: milestoneAbi,
@@ -410,10 +441,59 @@ export default function Dashboard() {
                       //     updateUI();
                       //   },
                       // });
-                      await registerCreator().then((tx) =>
-                        setHash(tx.transaction_hash)
-                      );
-                      setRegistering(false);
+                      const data = JSON.stringify({
+                        name: formInput.name,
+                        //                 "image": "data:image/svg+xml;base64,',
+                        // Base64.encode(bytes(finalSvg)),
+                        image:
+                          "data:image/svg+xml;base64," +
+                          btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="270" height="270" fill="none">
+                        <path fill="url(#B)" d="M1 0h280v270H0z"/>
+                          <defs>
+                            <filter id="A" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse" height="270" width="270">
+                              <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity=".225" width="200%" height="200%"/>
+                            </filter>
+                          </defs>
+                        <g transform="translate(15.000000,160.000000) scale(0.100000,-0.100000)"
+                      fill="#fff" stroke="none">
+                      <path d="M575 1413 c-90 -18 -235 -89 -303 -147 -117 -101 -202 -233 -239
+                      -376 -23 -87 -23 -253 0 -340 94 -360 444 -588 807 -526 225 39 414 182 515
+                      391 55 113 74 201 70 325 -3 120 -16 172 -70 285 -72 150 -180 258 -330 330
+                      -49 23 -112 48 -140 55 -74 18 -230 20 -310 3z m585 -180 c72 -65 27 -183 -70
+                      -183 -97 0 -142 118 -70 183 22 20 41 27 70 27 29 0 48 -7 70 -27z m-301 -163
+                      c136 -53 240 -168 275 -301 20 -80 14 -208 -14 -282 -41 -108 -148 -215 -257
+                      -258 -83 -32 -244 -32 -325 0 -118 46 -218 147 -263 266 -26 66 -14 75 96 75
+                      72 0 92 -3 104 -17 9 -10 29 -35 47 -56 46 -57 100 -81 178 -81 129 0 226 89
+                      235 216 12 174 -166 302 -327 235 -44 -19 -95 -63 -114 -98 l-15 -29 -109 0
+                      c-130 0 -129 -1 -75 107 58 117 180 215 301 241 67 15 205 5 263 -18z"/>
+                      </g>
+                        <defs>
+                          <linearGradient id="B" x1="0" y1="0" x2="270" y2="270" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#aa367c"/><stop offset="1" stop-color="#4a2fbd" stop-opacity=".99"/>
+                          </linearGradient>
+                        </defs>
+                        <text x="32.5" y="231" font-size="27" fill="#fff" filter="url(#A)" font-family="Plus Jakarta Sans,DejaVu Sans,Noto Color Emoji,Apple Color Emoji,sans-serif" font-weight="bold">
+                          ${formInput.name}
+                        </text>
+                      </svg>`),
+                      });
+                      try {
+                        const added = await client.add(data);
+                        const url = `https://ipfs.io/ipfs/${added.path}`;
+                        console.log("profile nFT");
+                        console.log(url);
+                        setNameUrlFelt(strToFeltArr(url));
+                        // mintCollectible(url, price);
+                        // console.log(strToFeltArr(url));
+                        // mintCollectible();
+                      } catch (error) {}
+
+                      setUploading(false);
+
+                      // await registerCreator().then((tx) =>
+                      //   setHash(tx.transaction_hash)
+                      // );
+                      // setRegistering(false);
                     }}
                   >
                     {isUploading

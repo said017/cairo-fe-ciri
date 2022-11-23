@@ -13,14 +13,10 @@ import "animate.css";
 import TrackVisibility from "react-on-screen";
 import { useState, useEffect } from "react";
 import { create as ipfsHttpClient } from "ipfs-http-client";
-import milestoneAbi from "../constants/MilestoneNFTv2.json";
-import collectibleAbi from "../constants/CollectibleNFT.json";
-import daoAbi from "../constants/CiriverseDAO.json";
-import { useMoralis, useWeb3Contract } from "react-moralis";
 import { utils } from "ethers";
 import Loader from "./Loader";
 import ciri_vote_Abi from "../constants/abis/ciri_vote.json";
-import ciri_profile_Abi from "../constants/abis/ciri-profile.json";
+import ciri_profile_Abi from "../constants/abis/ciri_profile.json";
 import { toHex, toHexString, toFelt } from "starknet/utils/number";
 import { uint256ToBN, bnToUint256 } from "starknet/dist/utils/uint256";
 import {
