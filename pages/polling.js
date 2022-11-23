@@ -1,7 +1,6 @@
 import { Container, Row, Col, ListGroup } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import useSound from "use-sound";
-import daoAbi from "../constants/CiriverseDAO.json";
 import ciri_vote_Abi from "../constants/abis/ciri_vote.json";
 
 import { useRouter } from "next/router";
