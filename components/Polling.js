@@ -57,7 +57,7 @@ export default function Polling() {
   const [isUploading, setUploading] = useState(false);
   const [onSale, setOnSale] = useState(false);
   const [collectibles, setCollectibles] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [hash, setHash] = useState(undefined);
   const [executeIndex, setExecuteIndex] = useState(0);
   const [formInput, updateFormInput] = useState({

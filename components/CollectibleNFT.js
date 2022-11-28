@@ -55,7 +55,7 @@ export default function CollectibleNFT() {
   const [isUploading, setUploading] = useState(false);
   const [onSale, setOnSale] = useState(false);
   const [collectibles, setCollectibles] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const [tokenLow, setTokenLow] = useState(0);
   const [tokenHigh, setTokenHigh] = useState(0);
   const [hash, setHash] = useState(undefined);
@@ -198,10 +198,10 @@ export default function CollectibleNFT() {
         tokenId.tokenId.high.toString(),
       ]);
       if (col_counts > 0) {
-        console.log("masuk sini uri col");
+        // console.log("masuk sini uri col");
         console.log(col_counts);
         for (let i = 0; i < parseInt(col_counts.count.toString()); i++) {
-          console.log("masuk sini ga ayah");
+          // console.log("masuk sini ga ayah");
           const uri = await ciri_profile_contract.get_collectible_img_id(
             [tokenId.tokenId.low.toString(), tokenId.tokenId.high.toString()],
             // collectible_data.collectible[0].profile_id,
