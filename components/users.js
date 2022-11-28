@@ -28,7 +28,7 @@ export default function Users() {
   // const [funds, setFunds] = useState("0");
   // const [donatorsCount, setdonatorsCount] = useState("0");
   const [profiles, setProfiles] = useState([]);
-  const [isFetching, setIsFetching] = useState(false);
+  const [isFetching, setIsFetching] = useState(true);
   const router = useRouter();
 
   const ciriAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS;
@@ -118,7 +118,8 @@ export default function Users() {
       // updateFunds();
       // updateDonatorsCount();
       refreshNum();
-      updateCreators();
+      // console.log("refreshed status?");
+      // updateCreators();
     }
   }, [status, account]);
 
@@ -128,6 +129,7 @@ export default function Users() {
       // updateDonatorsCount();
       // refreshNum();
       updateCreators();
+      // console.log("Refreshed num?");
     }
   }, [num]);
 
@@ -158,7 +160,7 @@ export default function Users() {
           >
             <h4>Creators</h4>
             <Row className="p-4 justify-content-center text-white">
-              {isFetching ? (
+              {isFetching || loadingNum ? (
                 <div className="justify-content-center">
                   <Loader />
                 </div>
